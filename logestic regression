@@ -1,0 +1,613 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "name": "Untitled10.ipynb",
+      "provenance": [],
+      "authorship_tag": "ABX9TyMvML1vMPMO+pzBHrmOcoxJ",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/NAGAVARUNBHOGADI/FML/blob/main/logestic%20regression\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Diabetes Prediction Classifier using Logistic Regression."
+      ],
+      "metadata": {
+        "id": "ICHzpI_XOpL9"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Import Packages, Functions and classes"
+      ],
+      "metadata": {
+        "id": "sxuU28ihOqMt"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import matplotlib.pyplot as plt\n",
+        "import pandas as pd\n",
+        "import numpy as np\n",
+        "from sklearn.model_selection import train_test_split\n",
+        "from sklearn.preprocessing import StandardScaler\n",
+        "from sklearn.linear_model import LogisticRegression\n",
+        "from sklearn.metrics import classification_report, confusion_matrix"
+      ],
+      "metadata": {
+        "id": "eFv2r_jnOt_X"
+      },
+      "execution_count": 144,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "read the CSV file using pandas"
+      ],
+      "metadata": {
+        "id": "Kq8WfybyO0VA"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "The head method is used to display the first five rows\n",
+        "\n"
+      ],
+      "metadata": {
+        "id": "B7Q9rjUlO1L5"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "data=pd.read_csv(\"/diabetes.csv\")\n",
+        "data.head()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 206
+        },
+        "id": "6_0sIFHTO555",
+        "outputId": "cf2a930a-f778-4be6-9749-14b8a4c70c38"
+      },
+      "execution_count": 145,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "   pregnancies  glucose  diastolic  triceps  insulin   bmi    dpf  age  \\\n",
+              "0            6      148         72       35        0  33.6  0.627   50   \n",
+              "1            1       85         66       29        0  26.6  0.351   31   \n",
+              "2            8      183         64        0        0  23.3  0.672   32   \n",
+              "3            1       89         66       23       94  28.1  0.167   21   \n",
+              "4            0      137         40       35      168  43.1  2.288   33   \n",
+              "\n",
+              "   diabetes  \n",
+              "0         1  \n",
+              "1         0  \n",
+              "2         1  \n",
+              "3         0  \n",
+              "4         1  "
+            ],
+            "text/html": [
+              "\n",
+              "  <div id=\"df-6697bf54-e36d-4512-9899-6ce3e86ab365\">\n",
+              "    <div class=\"colab-df-container\">\n",
+              "      <div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>pregnancies</th>\n",
+              "      <th>glucose</th>\n",
+              "      <th>diastolic</th>\n",
+              "      <th>triceps</th>\n",
+              "      <th>insulin</th>\n",
+              "      <th>bmi</th>\n",
+              "      <th>dpf</th>\n",
+              "      <th>age</th>\n",
+              "      <th>diabetes</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td>6</td>\n",
+              "      <td>148</td>\n",
+              "      <td>72</td>\n",
+              "      <td>35</td>\n",
+              "      <td>0</td>\n",
+              "      <td>33.6</td>\n",
+              "      <td>0.627</td>\n",
+              "      <td>50</td>\n",
+              "      <td>1</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>1</th>\n",
+              "      <td>1</td>\n",
+              "      <td>85</td>\n",
+              "      <td>66</td>\n",
+              "      <td>29</td>\n",
+              "      <td>0</td>\n",
+              "      <td>26.6</td>\n",
+              "      <td>0.351</td>\n",
+              "      <td>31</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>2</th>\n",
+              "      <td>8</td>\n",
+              "      <td>183</td>\n",
+              "      <td>64</td>\n",
+              "      <td>0</td>\n",
+              "      <td>0</td>\n",
+              "      <td>23.3</td>\n",
+              "      <td>0.672</td>\n",
+              "      <td>32</td>\n",
+              "      <td>1</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>3</th>\n",
+              "      <td>1</td>\n",
+              "      <td>89</td>\n",
+              "      <td>66</td>\n",
+              "      <td>23</td>\n",
+              "      <td>94</td>\n",
+              "      <td>28.1</td>\n",
+              "      <td>0.167</td>\n",
+              "      <td>21</td>\n",
+              "      <td>0</td>\n",
+              "    </tr>\n",
+              "    <tr>\n",
+              "      <th>4</th>\n",
+              "      <td>0</td>\n",
+              "      <td>137</td>\n",
+              "      <td>40</td>\n",
+              "      <td>35</td>\n",
+              "      <td>168</td>\n",
+              "      <td>43.1</td>\n",
+              "      <td>2.288</td>\n",
+              "      <td>33</td>\n",
+              "      <td>1</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>\n",
+              "      <button class=\"colab-df-convert\" onclick=\"convertToInteractive('df-6697bf54-e36d-4512-9899-6ce3e86ab365')\"\n",
+              "              title=\"Convert this dataframe to an interactive table.\"\n",
+              "              style=\"display:none;\">\n",
+              "        \n",
+              "  <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\"viewBox=\"0 0 24 24\"\n",
+              "       width=\"24px\">\n",
+              "    <path d=\"M0 0h24v24H0V0z\" fill=\"none\"/>\n",
+              "    <path d=\"M18.56 5.44l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94zm-11 1L8.5 8.5l.94-2.06 2.06-.94-2.06-.94L8.5 2.5l-.94 2.06-2.06.94zm10 10l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94z\"/><path d=\"M17.41 7.96l-1.37-1.37c-.4-.4-.92-.59-1.43-.59-.52 0-1.04.2-1.43.59L10.3 9.45l-7.72 7.72c-.78.78-.78 2.05 0 2.83L4 21.41c.39.39.9.59 1.41.59.51 0 1.02-.2 1.41-.59l7.78-7.78 2.81-2.81c.8-.78.8-2.07 0-2.86zM5.41 20L4 18.59l7.72-7.72 1.47 1.35L5.41 20z\"/>\n",
+              "  </svg>\n",
+              "      </button>\n",
+              "      \n",
+              "  <style>\n",
+              "    .colab-df-container {\n",
+              "      display:flex;\n",
+              "      flex-wrap:wrap;\n",
+              "      gap: 12px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert {\n",
+              "      background-color: #E8F0FE;\n",
+              "      border: none;\n",
+              "      border-radius: 50%;\n",
+              "      cursor: pointer;\n",
+              "      display: none;\n",
+              "      fill: #1967D2;\n",
+              "      height: 32px;\n",
+              "      padding: 0 0 0 0;\n",
+              "      width: 32px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert:hover {\n",
+              "      background-color: #E2EBFA;\n",
+              "      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);\n",
+              "      fill: #174EA6;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert {\n",
+              "      background-color: #3B4455;\n",
+              "      fill: #D2E3FC;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert:hover {\n",
+              "      background-color: #434B5C;\n",
+              "      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);\n",
+              "      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));\n",
+              "      fill: #FFFFFF;\n",
+              "    }\n",
+              "  </style>\n",
+              "\n",
+              "      <script>\n",
+              "        const buttonEl =\n",
+              "          document.querySelector('#df-6697bf54-e36d-4512-9899-6ce3e86ab365 button.colab-df-convert');\n",
+              "        buttonEl.style.display =\n",
+              "          google.colab.kernel.accessAllowed ? 'block' : 'none';\n",
+              "\n",
+              "        async function convertToInteractive(key) {\n",
+              "          const element = document.querySelector('#df-6697bf54-e36d-4512-9899-6ce3e86ab365');\n",
+              "          const dataTable =\n",
+              "            await google.colab.kernel.invokeFunction('convertToInteractive',\n",
+              "                                                     [key], {});\n",
+              "          if (!dataTable) return;\n",
+              "\n",
+              "          const docLinkHtml = 'Like what you see? Visit the ' +\n",
+              "            '<a target=\"_blank\" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'\n",
+              "            + ' to learn more about interactive tables.';\n",
+              "          element.innerHTML = '';\n",
+              "          dataTable['output_type'] = 'display_data';\n",
+              "          await google.colab.output.renderOutput(dataTable, element);\n",
+              "          const docLink = document.createElement('div');\n",
+              "          docLink.innerHTML = docLinkHtml;\n",
+              "          element.appendChild(docLink);\n",
+              "        }\n",
+              "      </script>\n",
+              "    </div>\n",
+              "  </div>\n",
+              "  "
+            ]
+          },
+          "metadata": {},
+          "execution_count": 145
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Now remove the label data from the input data"
+      ],
+      "metadata": {
+        "id": "j7kIGMilQFXS"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "X = data.drop('diabetes', axis=1)\n",
+        "y = data.iloc[:,[-1]]\n",
+        "print(type(X))\n",
+        "print(type(y))"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "5C-fHXxwQu64",
+        "outputId": "fcc1d411-5908-43eb-b19f-9accc1d2bb30"
+      },
+      "execution_count": 146,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "<class 'pandas.core.frame.DataFrame'>\n",
+            "<class 'pandas.core.frame.DataFrame'>\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        ""
+      ],
+      "metadata": {
+        "id": "r3o9ScJgQFr1"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Now split the data into training data and testing data"
+      ],
+      "metadata": {
+        "id": "V3Jr5xVWQSZd"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "X_train, X_test, y_train, y_test =train_test_split(X, y, test_size=0.02, random_state=1,stratify=y)"
+      ],
+      "metadata": {
+        "id": "MSZ2wjvtQohh"
+      },
+      "execution_count": 147,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Scale the training data such that the mean of each column becomes equal to zero, and the standard deviation of each column is one.\n",
+        "\n"
+      ],
+      "metadata": {
+        "id": "JuwUJCN4Q3yr"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "scaler = StandardScaler()\n",
+        "X_train = scaler.fit_transform(X_train)"
+      ],
+      "metadata": {
+        "id": "P91k2LfAQ4i2"
+      },
+      "execution_count": 148,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Fit the hyper-parameter(c) and training data."
+      ],
+      "metadata": {
+        "id": "90IeHPDRRCYT"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "model = LogisticRegression()\n",
+        "model.fit(X_train, y_train)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "W7haljASRJgZ",
+        "outputId": "e8b77fd8-90f2-4a84-dd07-2c5df4ea593d"
+      },
+      "execution_count": 149,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stderr",
+          "text": [
+            "/usr/local/lib/python3.7/dist-packages/sklearn/utils/validation.py:993: DataConversionWarning: A column-vector y was passed when a 1d array was expected. Please change the shape of y to (n_samples, ), for example using ravel().\n",
+            "  y = column_or_1d(y, warn=True)\n"
+          ]
+        },
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "LogisticRegression()"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 149
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Scale the testing *data*"
+      ],
+      "metadata": {
+        "id": "D71ER69tRT02"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "X_test = scaler.fit_transform(X_test)\n",
+        "y_pred = model.predict(X_test)\n",
+        "type(y_pred)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Ys9QC4MCRakJ",
+        "outputId": "2d5cf92a-1ec1-4583-89a3-c27f1bf3fe23"
+      },
+      "execution_count": 150,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "numpy.ndarray"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 150
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Measure the performance of Training data."
+      ],
+      "metadata": {
+        "id": "NK5rEvXRRgV2"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "model.score(X_test, y_pred)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "pQSZGxINRhD9",
+        "outputId": "577d5d13-e97e-4613-c433-7a819ff5b0fc"
+      },
+      "execution_count": 151,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "1.0"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 151
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Measure the performance of Testing data."
+      ],
+      "metadata": {
+        "id": "r2d4l2WARotz"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "model.score(X_train, y_train)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "KAr6GQWuRpWh",
+        "outputId": "736a3086-e03c-4bcc-bf4a-c69c66ca99e0"
+      },
+      "execution_count": 152,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "0.7832446808510638"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 152
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Build a Confusion matrix for actual label data and predicted label data."
+      ],
+      "metadata": {
+        "id": "c_4DX1RfRuch"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "confusion_matrix(y_test, y_pred)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "tC5QMqxeRx0E",
+        "outputId": "59e9fc5f-3531-459d-cc0a-dd771e2d5b5a"
+      },
+      "execution_count": 153,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "array([[10,  0],\n",
+              "       [ 2,  4]])"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 153
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Find all the evaluation metrics like accuracy,precision,recall and f1-score"
+      ],
+      "metadata": {
+        "id": "e-AAKhWXR41Z"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "print(classification_report(y_test, y_pred))"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "fPZDUGKKR5W7",
+        "outputId": "dc066bde-49de-4723-9599-b7662a373007"
+      },
+      "execution_count": 154,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "              precision    recall  f1-score   support\n",
+            "\n",
+            "           0       0.83      1.00      0.91        10\n",
+            "           1       1.00      0.67      0.80         6\n",
+            "\n",
+            "    accuracy                           0.88        16\n",
+            "   macro avg       0.92      0.83      0.85        16\n",
+            "weighted avg       0.90      0.88      0.87        16\n",
+            "\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
